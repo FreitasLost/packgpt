@@ -1,0 +1,402 @@
+<html>
+<title> SK STORE</title>
+<style>
+  :root {
+    --bg-color: #1a1a2e;
+    --text-color: #fff;
+    --sidebar-bg: rgba(255, 255, 255, 0.1);
+    --input-bg: rgba(255, 255, 255, 0.2);
+    --button-bg: #4CAF50;
+    --button-hover: #45a049;
+    --ai-option-bg: rgba(255, 255, 255, 0.1);
+    --ai-option-hover: rgba(255, 255, 255, 0.2);
+    --ai-option-active: #4CAF50;
+    --error-color: #ff6b6b;
+    --category-bg: rgba(255, 255, 255, 0.05);
+  }
+
+  .light-mode {
+    --bg-color: #f0f0f0;
+    --text-color: #333;
+    --sidebar-bg: #e0e0e0;
+    --input-bg: #fff;
+    --button-bg: #2196F3;
+    --button-hover: #1976D2;
+    --ai-option-bg: #d0d0d0;
+    --ai-option-hover: #c0c0c0;
+    --ai-option-active: #2196F3;
+    --error-color: #f44336;
+    --category-bg: rgba(0, 0, 0, 0.05);
+  }
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .container {
+    display: flex;
+    height: 100vh;
+  }
+
+  .sidebar {
+    width: 250px;
+    background-color: var(--sidebar-bg);
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    transition: width 0.3s ease, background-color 0.3s;
+  }
+
+  .sidebar.collapsed {
+    width: 60px;
+  }
+
+  .main-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    transition: margin-left 0.3s ease;
+  }
+
+  .creation-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: var(--input-bg);
+    border-radius: 10px;
+    transition: background-color 0.3s;
+  }
+
+  .input-area {
+    display: flex;
+    flex-direction: column;
+  }
+
+  textarea, #creation-type {
+    height: 100px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    resize: vertical;
+    transition: background-color 0.3s, color 0.3s, transform 0.3s;
+  }
+
+  textarea:focus, #creation-type:focus {
+    outline: none;
+    transform: scale(1.02);
+  }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--button-bg);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+
+  button:hover {
+    background-color: var(--button-hover);
+    transform: translateY(-2px);
+  }
+
+  button:active {
+    transform: translateY(1px);
+  }
+
+  .ai-category {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: var(--category-bg);
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+
+  .ai-category h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+  }
+
+  .ai-option {
+    margin-bottom: 5px;
+    padding: 8px;
+    background-color: var(--ai-option-bg);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ai-option:hover {
+    background-color: var(--ai-option-hover);
+    transform: translateX(5px);
+  }
+
+  .ai-option.active {
+    background-color: var(--ai-option-active);
+  }
+
+  .bubble {
+    position: absolute;
+    border-radius: 50%;
+    animation: float 5s infinite ease-in-out;
+    pointer-events: none;
+    transition: background-color 3s ease;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+
+  .loading {
+    text-align: center;
+    font-size: 24px;
+    margin-top: 20px;
+  }
+
+  .error {
+    color: var(--error-color);
+    margin-top: 10px;
+  }
+
+  #toggle-sidebar, #toggle-theme {
+    position: absolute;
+    top: 10px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: color 0.3s, transform 0.3s;
+  }
+
+  #toggle-sidebar {
+    left: 10px;
+  }
+
+  #toggle-theme {
+    right: 10px;
+  }
+
+  #toggle-sidebar:hover, #toggle-theme:hover {
+    transform: scale(1.1);
+  }
+
+  .sidebar h2 {
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar.collapsed h2, .sidebar.collapsed .ai-category h3 {
+    opacity: 0;
+  }
+
+  .ai-option .icon {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+  }
+
+  .sidebar.collapsed .ai-option .icon {
+    margin-right: 0;
+  }
+
+  .sidebar.collapsed .ai-option span:not(.icon) {
+    display: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .creation-area > * {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .ai-option, button, textarea, #creation-type {
+    animation: slideIn 0.3s ease-out;
+  }
+</style>
+</head>
+<body>
+<button id="toggle-sidebar">☰</button>
+<button id="toggle-theme">🌓</button>
+<div class="container">
+  <div class="sidebar">
+    <h2>Escolha uma IA</h2>
+    <div class="ai-category">
+      <h3>Chatbots</h3>
+      <div class="ai-option" data-ai="personalized-chatbot"><span class="icon">🤖</span><span>Chatbot Personalizado</span></div>
+    </div>
+    <div class="ai-category">
+      <h3>Geração de Imagem</h3>
+      <div class="ai-option" data-ai="flux-pro"><span class="icon">🎨</span><span>FLUX-pro</span></div>
+      <div class="ai-option" data-ai="ideogram"><span class="icon">🖼️</span><span>Ideogram</span></div>
+      <div class="ai-option" data-ai="flux-dev"><span class="icon">🔬</span><span>FLUX-dev</span></div>
+      <div class="ai-option" data-ai="dall-e-3"><span class="icon">🎭</span><span>DALL-E-3</span></div>
+      <div class="ai-option" data-ai="stablediffusion3"><span class="icon">🖌️</span><span>StableDiffusion3</span></div>
+      <div class="ai-option" data-ai="sd3-turbo"><span class="icon">⚡</span><span>SD3-Turbo</span></div>
+      <div class="ai-option" data-ai="stablediffusionxl"><span class="icon">🖼️</span><span>StableDiffusionXL</span></div>
+      <div class="ai-option" data-ai="pika"><span class="icon">🎥</span><span>Pika (vídeo)</span></div>
+    </div>
+    <div class="ai-category">
+      <h3>Geração de Texto</h3>
+      <div class="ai-option" data-ai="claude-3.5-sonnet"><span class="icon">📝</span><span>Claude-3.5-Sonnet</span></div>
+      <div class="ai-option" data-ai="gpt-4o-mini"><span class="icon">🤏</span><span>GPT-4o-Mini</span></div>
+      <div class="ai-option" data-ai="gpt-4o"><span class="icon">🧠</span><span>GPT-4o</span></div>
+      <div class="ai-option" data-ai="gemini-1.5-flash"><span class="icon">⚡</span><span>Gemini-1.5-Flash</span></div>
+      <div class="ai-option" data-ai="gemini-1.5-pro"><span class="icon">💎</span><span>Gemini-1.5-Pro</span></div>
+      <div class="ai-option" data-ai="claude-3-sonnet"><span class="icon">🎭</span><span>Claude-3-Sonnet</span></div>
+      <div class="ai-option" data-ai="claude-3-haiku"><span class="icon">📜</span><span>Claude-3-Haiku</span></div>
+      <div class="ai-option" data-ai="claude-3-opus"><span class="icon">🎻</span><span>Claude-3-Opus</span></div>
+      <div class="ai-option" data-ai="gemini-1.5-flash-128k"><span class="icon">💨</span><span>Gemini-1.5-Flash-128k</span></div>
+      <div class="ai-option" data-ai="gemini-1.5-pro-128k"><span class="icon">💡</span><span>Gemini-1.5-Pro-128k</span></div>
+      <div class="ai-option" data-ai="gemini-1.5-flash-1m"><span class="icon">🚀</span><span>Gemini-1.5-Flash-1M</span></div>
+      <div class="ai-option" data-ai="gemini-1.5-pro-2m"><span class="icon">🌟</span><span>Gemini-1.5-Pro-2M</span></div>
+      <div class="ai-option" data-ai="gpt-4o-mini-128k"><span class="icon">🔬</span><span>GPT-4o-Mini-128k</span></div>
+      <div class="ai-option" data-ai="gpt-4o-128k"><span class="icon">🧠</span><span>GPT-4o-128k</span></div>
+      <div class="ai-option" data-ai="gpt-4-turbo"><span class="icon">🚀</span><span>GPT-4-Turbo</span></div>
+      <div class="ai-option" data-ai="gemini-1.0-pro"><span class="icon">💎</span><span>Gemini-1.0-Pro</span></div>
+      <div class="ai-option" data-ai="gpt-3.5-turbo"><span class="icon">⚡</span><span>GPT-3.5-Turbo</span></div>
+      <div class="ai-option" data-ai="gpt-4-turbo-128k"><span class="icon">🚀</span><span>GPT-4-Turbo-128k</span></div>
+      <div class="ai-option" data-ai="claude-3.5-sonnet-200k"><span class="icon">📚</span><span>Claude-3.5-Sonnet-200k</span></div>
+      <div class="ai-option" data-ai="claude-3-sonnet-200k"><span class="icon">🎭</span><span>Claude-3-Sonnet-200k</span></div>
+      <div class="ai-option" data-ai="claude-3-haiku-200k"><span class="icon">📜</span><span>Claude-3-Haiku-200k</span></div>
+      <div class="ai-option" data-ai="claude-3-opus-200k"><span class="icon">🎻</span><span>Claude-3-Opus-200k</span></div>
+    </div>
+  </div>
+  <div class="main-area">
+    <div class="creation-area" id="creation-output">
+      <h1>🌍 Bem-vindo ao Site VItalicio da SK Store! 🚀</h1>
+      <p>Seu acesso é vitalicio do nosso site.</p>
+      <h2>🧠 Alimentado por IA de Ponta</h2>
+      <p>Experimente o futuro da criatividade com nossa suíte de modelos de IA de última geração. Da geração de texto à síntese de imagens, produção de vídeo a chatbots interativos, o SK Store coloca as capacidades de IA mais avançadas ao seu alcance.</p>
+      <h2>🎨 Possibilidades Criativas Infinitas</h2>
+      <p>Deixe sua imaginação fluir enquanto explora o vasto panorama do potencial criativo. Crie histórias envolventes, projete visuais deslumbrantes, componha música evocativa e muito mais. Com o SK Store, o único limite é sua própria criatividade.</p>
+      <h2>🤝 Colaboração Intuitiva</h2>
+      <p>Trabalhar com IA nunca foi tão fácil. Nossa interface intuitiva permite uma colaboração perfeita entre você e nossos modelos de IA. Forneça prompts, defina parâmetros e observe com espanto enquanto a IA dá vida à sua visão em tempo real.</p>
+      <h2>🌈 Experiências Imersivas</h2>
+      <p>Entre em um mundo de maravilhas com as criações imersivas do SK Store. De narrativas interativas a espetáculos visuais impressionantes, cada experiência é criada para cativar e inspirar. Prepare-se para ser transportado para novos reinos da imaginação.</p>
+      <p>Pronto para embarcar em sua jornada criativa impulsionada pela IA? Selecione um modelo de IA na barra lateral e deixe a magia começar! 🎉</p>
+    </div>
+    <div class="input-area">
+      <select id="creation-type">
+        <option value="text">Gerar Texto</option>
+        <option value="image">Gerar Imagem</option>
+        <option value="code">Gerar Código</option>
+      </select>
+      <textarea id="user-input" placeholder="Digite seu prompt aqui..."></textarea>
+      <button id="generate-btn">Gerar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const sidebarToggle = document.getElementById('toggle-sidebar');
+  const sidebar = document.querySelector('.sidebar');
+  const mainArea = document.querySelector('.main-area');
+  const themeToggle = document.getElementById('toggle-theme');
+  const aiOptions = document.querySelectorAll('.ai-option');
+  const userInput = document.getElementById('user-input');
+  const generateBtn = document.getElementById('generate-btn');
+  const creationOutput = document.getElementById('creation-output');
+  const creationType = document.getElementById('creation-type');
+
+  let selectedAI = null;
+  let isGenerating = false;
+  
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+  });
+
+  aiOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      aiOptions.forEach(opt => opt.classList.remove('active'));
+      option.classList.add('active');
+      selectedAI = option.dataset.ai;
+    });
+  });
+
+  generateBtn.addEventListener('click', async () => {
+    if (!selectedAI) {
+      alert('Por favor, selecione uma IA primeiro.');
+      return;
+    }
+
+    if (isGenerating) return;
+    isGenerating = true;
+    generateBtn.disabled = true;
+    generateBtn.textContent = 'Gerando...';
+
+    const prompt = userInput.value;
+    const type = creationType.value;
+
+    try {
+      creationOutput.innerHTML = '<div class="loading">Gerando ' + type + '...<br>Isso pode levar um momento.</div>';
+
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ai: selectedAI, prompt, type }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Generation failed');
+      }
+
+      const result = await response.text();
+      creationOutput.innerHTML = result;
+    } catch (err) {
+      console.error(err);
+      creationOutput.innerHTML = '<div class="error">Ops! Algo deu errado. Por favor, tente novamente.</div>';
+    }
+
+    isGenerating = false;
+    generateBtn.disabled = false;
+    generateBtn.textContent = 'Gerar';
+  });
+
+  function createBubble() {
+    const bubble = document.createElement('div');
+    bubble.classList.add('bubble');
+    bubble.style.left = Math.random() * 100 + 'vw';
+    bubble.style.animationDuration = Math.random() * 3 + 2 + 's';
+    bubble.style.opacity = Math.random();
+    bubble.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 70%)`;
+    bubble.style.width = bubble.style.height = Math.random() * 40 + 'px';
+    document.body.appendChild(bubble);
+    setTimeout(() => bubble.remove(), 5000);
+  }
+
+  setInterval(createBubble, 500);
+</script>
+</body>
+</html>
